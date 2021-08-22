@@ -9,19 +9,20 @@ const fileActions = {};
  * @param {boool} flat whether to flatten array or not
  * @returns {array}
  * *********************************************************/
-fileActions.readDir = (dir, flat = false) => fs.statSync(dir).isDirectory() && fs.promises.readdir(dir).then(files => Promise.all(files.reduce((list, file) => {
-  const name = path.join(dir, file);
-  const isDir = fs.statSync(name).isDirectory();
-  return list.concat(isDir ? fileActions.readDir(name) : [name]);
-}, [])))
-.then(files => flat ? files.flat(Infinity) : files)
-.catch(err => {
-  if (err.code === 'ENOTDIR') {
-    console.error(`"${dir}" is not a directory`);
-    return;
-  }
-  throw err;
-});
+fileActions.readDir = (dir, flat = false) => fs.statSync(dir).isDirectory() && fs.promises.readdir(dir)
+  .then(files => Promise.all(files.reduce((list, file) => {
+    const name = path.join(dir, file);
+    const isDir = fs.statSync(name).isDirectory();
+    return list.concat(isDir ? fileActions.readDir(name) : [name]);
+  }, [])))
+  .then(files => flat ? files.flat(Infinity) : files)
+  .catch(err => {
+    if (err.code === 'ENOTDIR') {
+      console.error(`"${dir}" is not a directory`);
+      return;
+    }
+    throw err;
+  });
 
 
 
@@ -31,13 +32,13 @@ fileActions.readDir = (dir, flat = false) => fs.statSync(dir).isDirectory() && f
  * @returns {buffer} contents of the file
  * *********************************************************/
 fileActions.readFile = dir => fs.statSync(dir).isFile() && fs.promises.readFile(dir)
-.catch(err => {
-  if (err.code === 'ENOENT') {
-    console.error(`"${dir}" is not a directory`);
-    return;
-  }
-  throw err;
-});
+  .catch(err => {
+    if (err.code === 'ENOENT') {
+      console.error(`"${dir}" is not a directory`);
+      return;
+    }
+    throw err;
+  });
 
 
 
